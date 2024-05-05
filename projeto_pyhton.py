@@ -6,7 +6,7 @@ Beatriz Sara dos Santos
 import os # importando para usar função de limpar o terminal
 import time
 import msvcrt
-
+import json
 
 def mostrar_menu_principal():
     print("==== Menu Principal ==== ")
@@ -47,48 +47,53 @@ def exibir_selecionado_menu_principal(opcao_menu_principal):
         
 
 # Recebe qual foi a operacao selecionada e a lista respectiva do menu principal        
-def executar_operacoes(opcao_menu_principal, opcao_operacao_selecionada, listas): 
+def executar_operacoes(opcao_menu_principal, opcao_operacao_selecionada, dados): 
     if opcao_operacao_selecionada == 1:
-        incluir(opcao_menu_principal, listas)
+        incluir(opcao_menu_principal, dados)
     elif opcao_operacao_selecionada == 2:
-        listar(listas)
+        listar(dados)
     elif opcao_operacao_selecionada == 3:
-        alterar(opcao_menu_principal, listas)
+        alterar(opcao_menu_principal, dados)
     elif opcao_operacao_selecionada == 4:
-        excluir(opcao_menu_principal, listas)
+        excluir(opcao_menu_principal, dados)
         
 # Recebe qual foi a operacao selecionada e dados(que é a lista) do menu principal
-def incluir(opcao_menu_principal, dados):
+def incluir(opcao_menu_principal, lista_dados):
     print("Opcao do menu operações selecionado: Incluir")
     if opcao_menu_principal == 1:
         codigo_aluno = int(input("Digite o código: "))
         nome = str(input("Insira o nome do Estudante: "))
         cpf = input("Digite o CPF: ")
         estudante_dicionario = {"cod_estudante": codigo_aluno, "nome_estudante":nome,"cpf_estudante": cpf }
-        dados.append(estudante_dicionario)# Nao sera mais de uma string nome, mas sim o append do dicionario
+        lista_dados.append(estudante_dicionario)# Nao sera mais de uma string nome, mas sim o append do dicionario
+        salvar_arquivo(lista_dados, arquivo_estudante)
+        
         
     elif opcao_menu_principal == 2:
         codigo_disciplina = int(input("Digite o código da disciplina: "))
         print("Em DESENVOLVIMENTO!")
-        time.sleep(3) 
+        
     elif opcao_menu_principal == 3:
         codigo_professor = int(input("Digite o código do professor: "))
         print("Em DESENVOLVIMENTO!")
-        time.sleep(3) 
+        
     elif opcao_menu_principal  == 4:
         codigo_turma = int(input("Digite o código da turma: "))
         print("Em DESENVOLVIMENTO!")
-        time.sleep(3)
+        
     else:
         codigo_matricula = int(input("Digite o código da matrícula: "))
         print("Em DESENVOLVIMENTO!")
-        time.sleep(3)
+    
+    print("Registro incluido com sucesso!")
+    print("Pressione qualquer tecla para continuar")
+    msvcrt.getch() # Pausa o sistema até que uma  tecla seja pressionada
         
 # Mostra os dados da lsita passado pelo def anterior          
-def listar(dados):
+def listar(lista_dados):
     print("Opcao do menu operações selecionado: Listar")
-    if len(dados) > 0:
-        for dado in dados:
+    if len(lista_dados) > 0:
+        for dado in lista_dados:
             print(dado)
     else:
         print("Não há dados cadastrados")
@@ -97,29 +102,26 @@ def listar(dados):
     msvcrt.getch() # Pausa o sistema até que uma  tecla seja pressionada
     
 # Altera o valor do dicionario 
-def alterar(opcao_menu_principal, listas):
+def alterar(opcao_menu_principal, lista_dados):
     print("Opcao do menu operações selecionado: Alterar")
     codigo = int(input("Qual código deseja alterar: "))
+    codigo_nao_encontrado = True
     
     if opcao_menu_principal == 1:
         alterar_estudante = None
         
-        for estudante_dicionario in listas:
+        for estudante_dicionario in lista_dados:
             if estudante_dicionario["cod_estudante"] == codigo:
                 alterar_estudante = estudante_dicionario
-                break
+                alterar_estudante["cod_estudante"] = int(input("Informe o novo código: "))
+                alterar_estudante["nome_estudante"] = input("Informe o novo nome: ")
+                alterar_estudante["cpf_estudante"] = input("Informe o novo CPF: ")
+                salvar_arquivo(lista_dados, arquivo_estudante)
+                print("Registro alterado com sucesso!")
+                codigo_nao_encontrado = False
         
-        if alterar_estudante is None: # Caso o código nao seja localizado para realizar alterações
+        if codigo_nao_encontrado:
             print(f"Não foi localizado o código {codigo} do estudante na lista")
-        
-        else: # Caso o código seja localizado para realizar alterações
-            alterar_estudante["cod_estudante"] = int(input("Informe o novo código: "))
-            alterar_estudante["nome_estudante"] = input("Informe o novo nome: ")
-            alterar_estudante["cpf_estudante"] = input("Informe o novo CPF: ")
-            print("Código do estudante alterado com sucesso!")
-            
-        for estudante in listas:
-            print(estudante)
     
     elif opcao_menu_principal == 2:
         alterar_disciplina = None
@@ -141,26 +143,25 @@ def alterar(opcao_menu_principal, listas):
         print("Em DESENVOLVIMENTO!")
         time.sleep(3) 
 
-    print("Pressione qualquer tecla para limpar o terminal e continuar")
-    msvcrt.getch() # comando para continuar o programa após preessionar qualquer tecla, como Enter por exemplo
+    print("Pressione qualquer tecla para continuar")
+    msvcrt.getch() # Pausa o sistema até que uma  tecla seja pressionada
     
 # Realiza a exclusão do código selecionado
-def excluir(opcao_menu_principal, listas):
+def excluir(opcao_menu_principal, lista_dados):
     print("Opcao do menu operações selecionado: Excluir")
     excluir_codigo = int(input("Qual código deseja excluir: "))
+    codigo_nao_encontrado = True
     
-    if opcao_menu_principal == 1:
-        remover_estudante = None # Funcionalidade para exluir código
-        
-        for estudante_dicionario in listas: # For, vai pesquisar o estudante na lista de estudantes
+    if opcao_menu_principal == 1:        
+        for estudante_dicionario in lista_dados: # For, vai pesquisar o estudante na lista de estudantes
             if estudante_dicionario["cod_estudante"] == excluir_codigo: # Se o estudante é localizado pelo código solicitado,
-                remover_estudante = estudante_dicionario                # é armazenado todo o dicionario dentro de uma variavel temporaria - remover_estudante
-                break
-        if remover_estudante is None: # Se o estudante não foi encontrado
+                lista_dados.remove(estudante_dicionario)
+                salvar_arquivo(lista_dados, arquivo_estudante)
+                codigo_nao_encontrado = False
+                print(f"Estudante de código {excluir_codigo} excluído com sucesso!")
+                
+        if codigo_nao_encontrado:  
             print(f"Não foi localizado o código {excluir_codigo} do estudante na lista")
-        else:
-            listas.remove(remover_estudante)
-            print("Código do estudante removido com sucesso!")
             
     elif opcao_menu_principal == 2:
         remover_disciplina = None # Funcionalidade para exluir código
@@ -182,17 +183,32 @@ def excluir(opcao_menu_principal, listas):
         print("Em DESENVOLVIMENTO!")
         time.sleep(3) 
 
-    print(listas)
+    print(lista_dados)
         
     print("Pressione qualquer tecla para limpar o terminal e continuar")
     msvcrt.getch() # comando para continuar o programa após preessionar qualquer tecla, como Enter por exemplo
 
 
-lista_estudantes = []
-lista_disciplinas = []
-lista_professores = []
-lista_turmas = []
-lista_matriculas = []
+def salvar_arquivo(lista_dados, nome_arquivo):
+    with open(nome_arquivo, "w", encoding="utf-8") as arquivo_aberto:
+        json.dump(lista_dados, arquivo_aberto, ensure_ascii=False)
+        
+def ler_arquivo(nome_arquivo):
+    try:
+        with open(nome_arquivo, "r", encoding="utf-8") as arquivo_aberto:
+            lista_dados = json.load(arquivo_aberto)
+            
+        return lista_dados
+    except:
+        return []
+
+arquivo_estudante = "estudantes.json"
+arquivo_disciplinas = "disciplinas.json"
+arquivo_professores = "professores.json"
+arquivo_turmas = "turmas.json"
+arquivo_matriculas = "matriculas.json"
+
+lista_dados = []
 
 # Código principal
 while True: # Estrutura de condição while repetindo enquanto as opções forem verdadeiras ou houver um break
@@ -214,23 +230,28 @@ while True: # Estrutura de condição while repetindo enquanto as opções forem
                 
                 # ESTUDANTES
                 if opcao_menu_principal == 1:
-                    executar_operacoes(opcao_menu_principal, opcao_operacao_selecionada, lista_estudantes)    
+                    dados = ler_arquivo(arquivo_estudante)
+                    executar_operacoes(opcao_menu_principal, opcao_operacao_selecionada, dados)    
 
                 # DISCIPLINA
                 elif opcao_menu_principal == 2:
-                    executar_operacoes(opcao_menu_principal, opcao_operacao_selecionada, lista_disciplinas)
+                    dados = ler_arquivo(arquivo_disciplinas)
+                    executar_operacoes(opcao_menu_principal, opcao_operacao_selecionada, dados)
                 
                 # PROFESSOR        
                 elif opcao_menu_principal == 3:
-                    executar_operacoes(opcao_menu_principal, opcao_operacao_selecionada, lista_professores)
+                    dados = ler_arquivo(arquivo_professores)
+                    executar_operacoes(opcao_menu_principal, opcao_operacao_selecionada, dados)
                 
                 # TURMA        
                 elif opcao_menu_principal == 4:
-                    executar_operacoes(opcao_menu_principal, opcao_operacao_selecionada, lista_turmas)
+                    dados  = ler_arquivo(arquivo_turmas)
+                    executar_operacoes(opcao_menu_principal, opcao_operacao_selecionada, dados)
                 
                 # MATRICULA        
                 elif opcao_menu_principal == 5:
-                    executar_operacoes(opcao_menu_principal, opcao_operacao_selecionada, lista_matriculas)
+                    dados = ler_arquivo(arquivo_matriculas)
+                    executar_operacoes(opcao_menu_principal, opcao_operacao_selecionada, dados)
                         
             elif opcao_operacao_selecionada == 5:
                 print("Voltando ao menu principal")
