@@ -71,19 +71,37 @@ def incluir(opcao_menu_principal, lista_dados):
         
     elif opcao_menu_principal == 2:
         codigo_disciplina = int(input("Digite o código da disciplina: "))
-        print("Em DESENVOLVIMENTO!")
+        nome = str(input("Insira o nome da Disciplina: "))
+        disciplina_dicionario = {"cod_disciplina":codigo_disciplina, "nome_disciplina":nome}
+        lista_dados.append(disciplina_dicionario)
+        salvar_arquivo(lista_dados, arquivo_disciplinas)
+        
         
     elif opcao_menu_principal == 3:
         codigo_professor = int(input("Digite o código do professor: "))
-        print("Em DESENVOLVIMENTO!")
+        nome = str(input("Insira o nome do Professor: "))
+        cpf = input("Digite o CPF: ")
+        professor_dicionario = {"cod_professor":codigo_professor, "nome_professor":nome}
+        lista_dados.append(professor_dicionario)
+        salvar_arquivo(lista_dados, arquivo_professores)
+        
         
     elif opcao_menu_principal  == 4:
         codigo_turma = int(input("Digite o código da turma: "))
-        print("Em DESENVOLVIMENTO!")
+        codigo_professor = int(input("Digite o código do professor: "))
+        codigo_disciplina = int(input("Digite o código da disciplina: "))
+        turma_dicionario = {"cod_turma": codigo_turma, "cod_professor": codigo_turma, "cod_disciplina": codigo_disciplina}
+        lista_dados.append(turma_dicionario)
+        salvar_arquivo(lista_dados, arquivo_turmas)
+        
         
     else:
-        codigo_matricula = int(input("Digite o código da matrícula: "))
-        print("Em DESENVOLVIMENTO!")
+        codigo_turma = int(input("Digite o código da turma: "))
+        codigo_estudante = int(input("Digite o código do estudante: "))
+        matricula_dicionario = {"cod_turma": codigo_turma, "cod_estudante": codigo_estudante}
+        lista_dados.append(matricula_dicionario)
+        salvar_arquivo(lista_dados, arquivo_matriculas)
+
     
     print("Registro incluido com sucesso!")
     print("Pressione qualquer tecla para continuar")
@@ -104,11 +122,11 @@ def listar(lista_dados):
 # Altera o valor do dicionario 
 def alterar(opcao_menu_principal, lista_dados):
     print("Opcao do menu operações selecionado: Alterar")
-    codigo = int(input("Qual código deseja alterar: "))
     codigo_nao_encontrado = True
     
     if opcao_menu_principal == 1:
         alterar_estudante = None
+        codigo = int(input("Qual código do estudante deseja alterar: "))
         
         for estudante_dicionario in lista_dados:
             if estudante_dicionario["cod_estudante"] == codigo:
@@ -125,23 +143,61 @@ def alterar(opcao_menu_principal, lista_dados):
     
     elif opcao_menu_principal == 2:
         alterar_disciplina = None
-        print("Em DESENVOLVIMENTO!")
-        time.sleep(3)  
+        codigo = int(input("Qual código da disciplina deseja alterar: "))
+        for disciplina_dicionario in lista_dados:
+            if disciplina_dicionario["cod_disciplina"] == codigo:
+                alterar_disciplina = disciplina_dicionario
+                alterar_disciplina["cod_disciplina"] = int(input("Informe novo código: "))
+                alterar_disciplina["nome_disciplina"] = input("Informe a nova disciplina: ")
+                salvar_arquivo(lista_dados, arquivo_disciplinas)
+                codigo_nao_encontrado = False
+        
+        if codigo_nao_encontrado:
+            print(f"Não foi localizado o código {codigo} da disciplina na lista")
         
     elif opcao_menu_principal == 3:
         alterar_professor = None
-        print("Em DESENVOLVIMENTO!")
-        time.sleep(3) 
-        
+        codigo = int(input("Qual código do professor deseja alterar: "))
+        for professor_dicionario in lista_dados:
+            if professor_dicionario["cod_professor"] == codigo:
+                alterar_professor = professor_dicionario
+                alterar_professor["cod_professor"] = int(input("Informe o novo código: "))
+                alterar_professor["nome_professor"] = input("Informe o novo nome do professor: ")
+                alterar_professor["cpf_professor"] = input("Informe o novo CPF: ")
+                salvar_arquivo(lista_dados, arquivo_professores)
+                codigo_nao_encontrado = False
+                
+        if codigo_nao_encontrado:
+            print(f"Não foi localizado o código {codigo} do professor na lista")
+              
     elif opcao_menu_principal  == 4:
         alterar_turma = None
-        print("Em DESENVOLVIMENTO!")
-        time.sleep(3) 
+        codigo = int(input("Qual código da turma deseja alterar: "))
+        for turma_dicionario in lista_dados:
+            if turma_dicionario["cod_turma"] == codigo:
+                alterar_turma = turma_dicionario
+                alterar_turma["cod_turma"] = int(input("Informe o novo código da turma: "))
+                alterar_turma["cod_professor"] = int(input("Informe o novo código do professor: "))
+                alterar_turma["cod_disciplina"] = int(input("Informe novo código da disciplina: "))
+                salvar_arquivo(lista_dados, arquivo_turmas)
+                codigo_nao_encontrado = False
+                
+        if codigo_nao_encontrado:
+            print(f"Não foi localizado o código {codigo} da turma na lista")
         
     else:
         alterar_matricula = None
-        print("Em DESENVOLVIMENTO!")
-        time.sleep(3) 
+        codigo = int(input("Qual código da turma deseja alterar: "))
+        for matricula_dicionario  in lista_dados:
+            if matricula_dicionario["cod_turma"] == codigo:
+                alterar_matricula = matricula_dicionario
+                alterar_matricula["cod_estudante"] = int(input("Informe o novo código do estudante: "))
+                alterar_matricula["cod_turma"] = int(input("Informe o novo código da turma: "))
+                salvar_arquivo(lista_dados, arquivo_matriculas)
+                codigo_nao_encontrado = False
+                
+        if codigo_nao_encontrado:
+            print(f"Não foi localizado o código {codigo} da turma na lista")
 
     print("Pressione qualquer tecla para continuar")
     msvcrt.getch() # Pausa o sistema até que uma  tecla seja pressionada
@@ -149,10 +205,11 @@ def alterar(opcao_menu_principal, lista_dados):
 # Realiza a exclusão do código selecionado
 def excluir(opcao_menu_principal, lista_dados):
     print("Opcao do menu operações selecionado: Excluir")
-    excluir_codigo = int(input("Qual código deseja excluir: "))
     codigo_nao_encontrado = True
     
-    if opcao_menu_principal == 1:        
+    if opcao_menu_principal == 1:
+        excluir_codigo = int(input("Qual código do estudante deseja excluir: "))
+        
         for estudante_dicionario in lista_dados: # For, vai pesquisar o estudante na lista de estudantes
             if estudante_dicionario["cod_estudante"] == excluir_codigo: # Se o estudante é localizado pelo código solicitado,
                 lista_dados.remove(estudante_dicionario)
@@ -164,24 +221,53 @@ def excluir(opcao_menu_principal, lista_dados):
             print(f"Não foi localizado o código {excluir_codigo} do estudante na lista")
             
     elif opcao_menu_principal == 2:
-        remover_disciplina = None # Funcionalidade para exluir código
-        print("Em DESENVOLVIMENTO!")
-        time.sleep(3) 
+        excluir_codigo = int(input("Qual código da disciplina deseja excluir: "))
+        
+        for disciplina_dicionario in lista_dados:
+            if disciplina_dicionario["cod_disciplina"] == excluir_codigo:
+                lista_dados.remove(disciplina_dicionario)
+                salvar_arquivo(lista_dados, arquivo_disciplinas)
+                codigo_nao_encontrado  = False
+                print(f"Disciplina de código {excluir_codigo} excluído com sucesso!")
+        if codigo_nao_encontrado:  
+            print(f"Não foi localizado o código {excluir_codigo} da disciplina na lista")                
         
     elif opcao_menu_principal == 3:
-        remover_professor = None # Funcionalidade para exluir código
-        print("Em DESENVOLVIMENTO!")
-        time.sleep(3) 
+        excluir_codigo = int(input("Qual código do professor deseja excluir: "))
+         
+        for professor_dicionario in lista_dados:
+            if professor_dicionario["cod_professor"] == excluir_codigo:
+                lista_dados.remove(professor_dicionario)
+                salvar_arquivo(lista_dados, arquivo_professores)
+                codigo_nao_encontrado = False
+                
+        if codigo_nao_encontrado:
+            print(f"Não foi localizado o código {excluir_codigo} do professor na lista")
+            
         
     elif opcao_menu_principal == 4:
-        remover_turma = None # Funcionalidade para exluir código
-        print("Em DESENVOLVIMENTO!")
-        time.sleep(3) 
+        excluir_codigo = int(input("Qual código da turma deseja excluir: "))
         
+        for turma_dicionario in lista_dados:
+            if turma_dicionario["cod_turma"] == excluir_codigo:
+                lista_dados.remove(turma_dicionario)
+                salvar_arquivo(lista_dados, arquivo_turmas)
+                codigo_nao_encontrado = False
+                
+        if codigo_nao_encontrado:
+            print(f"Não foi localizado o código {excluir_codigo} da turma na lista")
+
     else:
-        remover_matricula = None # Funcionalidade para exluir código
-        print("Em DESENVOLVIMENTO!")
-        time.sleep(3) 
+        for matricula_dicionario in lista_dados:
+            excluir_codigo = int(input("Qual código da turma deseja excluir: "))
+            
+            if matricula_dicionario["cod_turma"] == excluir_codigo:
+                lista_dados.remove(matricula_dicionario)
+                salvar_arquivo(lista_dados, arquivo_matriculas)
+                codigo_nao_encontrado = False
+                
+        if codigo_nao_encontrado:
+            print(f"Não foi localizado o código {excluir_codigo} da turma na lista")
 
     print(lista_dados)
         
